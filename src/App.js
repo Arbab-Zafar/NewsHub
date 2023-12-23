@@ -194,13 +194,19 @@ function App() {
   async function fetchNews(country, category, searchQuery) {
     let API_KEY = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&q=${searchQuery}&pageSize=100&page=${pageNo}&apiKey=34799383882949a7bfa3e5263b55f27a`;
     // let response = await fetch(API_KEY);
-    axios.get(API_KEY)
-      .then(response => {
-        setData(response.data);
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    try {
+      const response = await axios.get(API_KEY);
+      setData(response.data)
+    } catch (error) {
+      console.error(error);
+    }
+    // axios.get(API_KEY)
+    //   .then(response => {
+    //     setData(response.data);
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //   });
     console.log("DATA", data);
     keyIndex = 0;
   }
