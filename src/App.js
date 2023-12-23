@@ -1,6 +1,7 @@
 import './App.css';
 import News from './News';
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 let response = {
   "status": "ok",
@@ -181,15 +182,30 @@ function App() {
   const [pageNo, setPageNo] = useState(1);
   const [data, setData] = useState(demoData);
 
-  useEffect(() => { fetchNews(country, category, query) }, [])
+  // async function fetchNews(country, category, searchQuery) {
+  //   console.log("query= ", searchQuery);
+  //   let API_KEY = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&q=${searchQuery}&pageSize=100&page=${pageNo}&apiKey=34799383882949a7bfa3e5263b55f27a`;
+  //   let response = await fetch(API_KEY);
+  //   let data = await response.json();
+  //   setData(data);
+  //   console.log("DATA", data);
+  //   keyIndex = 0;
+  // }
   async function fetchNews(country, category, searchQuery) {
-    console.log("query= ", searchQuery);
     let API_KEY = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&q=${searchQuery}&pageSize=100&page=${pageNo}&apiKey=34799383882949a7bfa3e5263b55f27a`;
-    let response = await fetch(API_KEY);
-    let data = await response.json();
-    setData(data);
-    console.log(data);
+    // let response = await fetch(API_KEY);
+    axios.get(API_KEY)
+      .then(response => {
+        setData(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    console.log("DATA", data);
+    keyIndex = 0;
   }
+
+  useEffect(() => { fetchNews(country, category, query) }, [])
 
   function handleOk() {
     if (country !== "" && category !== "") {

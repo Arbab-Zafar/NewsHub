@@ -67,7 +67,7 @@ const News = ({ news, screenWidth, id }) => {
                 }
                 {/* <span className="author" style={{ fontSize: "12px", color: "#d09bff" }}><b className="bold">Author: </b>{news.author}</span> */}
             </div>
-            <a href="#" id="urltoNews" style={{ display: "none", marginBlock: "7px", fontSize: "12px", color: "#daa520" }} target="blank">Click for more!</a>
+            <a href="/" id="urltoNews" style={{ display: "none", marginBlock: "7px", fontSize: "12px", color: "#daa520" }} target="blank">Click for more!</a>
 
         </div>
     )
