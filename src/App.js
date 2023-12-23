@@ -2,10 +2,11 @@ import './App.css';
 import News from './News';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import LoadingBar from 'react-top-loading-bar'
 
 let response = {
   "status": "ok",
-  "totalResults": 35,
+  "totalResults": 12,
   "articles": [
     {
       "source": {
@@ -172,6 +173,7 @@ let screenWidth = window.innerWidth;
 let keyIndex = 0;
 
 function App() {
+  const apikey = process.env.REACT_APP_ONLY_API_KEY;
   // ALL USE STATE 
   const [country, setCountry] = useState("in");
   const [category, setCategory] = useState("general");
@@ -181,6 +183,7 @@ function App() {
   const [search, setSearch] = useState("");
   const [pageNo, setPageNo] = useState(1);
   const [data, setData] = useState(demoData);
+  const [progress, setProgress] = useState(0)
 
   // async function fetchNews(country, category, searchQuery) {
   //   console.log("query= ", searchQuery);
@@ -192,26 +195,25 @@ function App() {
   //   keyIndex = 0;
   // }
   async function fetchNews(country, category, searchQuery) {
-    let API_KEY = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&q=${searchQuery}&pageSize=100&page=${pageNo}&apiKey=34799383882949a7bfa3e5263b55f27a`;
+    setProgress(10);
+    let API_KEY = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&q=${searchQuery}&pageSize=100&page=${pageNo}&apiKey=${apikey}`;
     // let response = await fetch(API_KEY);
     try {
       const response = await axios.get(API_KEY);
+      setProgress(50);
       setData(response.data)
+      setProgress(100);
     } catch (error) {
       console.error(error);
     }
-    // axios.get(API_KEY)
-    //   .then(response => {
-    //     setData(response.data);
-    //   })
-    //   .catch(error => {
-    //     console.log(error);
-    //   });
-    console.log("DATA", data);
+    // console.log("DATA", data);
     keyIndex = 0;
   }
 
-  useEffect(() => { fetchNews(country, category, query) }, [])
+  useEffect(() => { 
+    fetchNews(country, category, query) 
+     // eslint-disable-next-line
+  }, [])
 
   function handleOk() {
     if (country !== "" && category !== "") {
@@ -219,6 +221,17 @@ function App() {
         fetchNews(country, category, query);
       }
     }
+  }
+
+  function prevFunc() {
+    setProgress(35)
+    setPageNo(pageNo > 1 ? pageNo - 1 : pageNo)
+    setProgress(100)
+  }
+  function nextFunc() {
+    setProgress(35)
+    setPageNo(pageNo < Math.ceil(data.totalResults / 15) ? pageNo + 1 : pageNo)
+    setProgress(100)
   }
 
   function searchNews(e) {
@@ -232,6 +245,8 @@ function App() {
         }
         else {
           document.querySelectorAll('.news')[index].style.display = "none";
+          // document.querySelector('.allNews').innerText = "No news found!"
+          document.querySelector(".nonewsfound").style.display = "flex";
         }
       })
       // newsDesc.forEach((element, index) => {
@@ -249,7 +264,6 @@ function App() {
       })
     }
     if (e.target.value.length === 0) {
-      console.log('Worked')
       document.querySelectorAll('.news').forEach(e => {
         e.style.display = "flex";
       })
@@ -257,12 +271,16 @@ function App() {
   }
 
   useEffect(() => {
-    console.log('useEffect ran. count is: ', pageNo);
     window.scrollTo(0, 0);
   }, [pageNo]);
 
   return (
     <div className="App">
+      <LoadingBar
+        color='#f11946'
+        progress={progress}
+        onLoaderFinished={() => setProgress(0)}
+      />
       <div className='navbar'>
         <div className='name'>
           <i className="fa-solid fa-newspaper fa-xl" style={{ color: "#daa520" }}></i>
@@ -368,26 +386,23 @@ function App() {
         data.articles.forEach(e => {
           //idk but it was running 2 times that's why
           if (e.index === undefined) {
-            if (keyIndex >= 30) {
-              e.index = keyIndex - (30 * pageNo);
+            if (keyIndex >= 15) {
+              e.index = keyIndex - (15 * pageNo);
             }
             else {
               e.index = keyIndex;
             }
             keyIndex += 1;
           }
-          else {
-            console.log("Getting inside the else")
-          }
         })
       }
-      {
-        console.log("Sliced data", data.articles.slice(30 * pageNo - 30, 30 * pageNo))
-      }
+      {/* {
+        console.log("Sliced data", data.articles.slice(15 * pageNo - 15, 15 * pageNo))
+      } */}
       {
         data.articles.length !== 0 ? (
           <div className="allNews">
-            {data.articles.slice(30 * pageNo - 30, 30 * pageNo).map((e) => { return <News news={e} screenWidth={screenWidth} key={e.title} id={e.index} /> })}
+            {data.articles.slice(15 * pageNo - 15, 15 * pageNo).map((e) => { return <News news={e} screenWidth={screenWidth} key={e.title} id={e.index} /> })}
           </div>)
           : (
             <div className="allNews">
@@ -395,11 +410,12 @@ function App() {
             </div>)
       }
 
+      <div className="nonewsfound" style={{marginBlock: "10px", display: "none", display: "flex", justifyContent: "center", fontSize: "13px"}}>No news found!</div>
 
       <div className="pageDiv">
-        <button className="prev" onClick={() => setPageNo(pageNo > 1 ? pageNo - 1 : pageNo)}><i className="fa-solid fa-arrow-left" style={{ color: "#ffffff" }} ></i></button>
+        <button className="prev" onClick={() => prevFunc()}><i className="fa-solid fa-arrow-left" style={{ color: "#ffffff" }} ></i></button>
         <span className="now">{pageNo}</span>
-        <button className="next" onClick={() => setPageNo(pageNo < Math.ceil(data.totalResults / 30) ? pageNo + 1 : pageNo)}><i className="fa-solid fa-arrow-right" style={{ color: "#ffffff" }}></i></button>
+        <button className="next" onClick={() => nextFunc()}><i className="fa-solid fa-arrow-right" style={{ color: "#ffffff" }}></i></button>
       </div>
 
     </div>

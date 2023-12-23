@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Oswald&family=Poppins&family=Roboto:ital@1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato&family=Poppins&family=Roboto:ital@1&display=swap');
 
 * {
     font-family: 'Poppins', 'Roboto', sans-serif;
@@ -195,23 +195,31 @@ option {
 
 }
 
-.sourceAndAuthor{
+.authorAndDate{
     display: flex;
-    justify-content: space-evenly;
+    justify-content: center;
     align-items: center;
     flex-wrap: wrap;
     width: 95%;
     margin-top: 5px;
     margin-bottom: 10px;
+    font-size: 12px;
+    color: #c7bfbf;
 }
 
 .author{
-    margin-top: 3px;
-    font-size: "12px";
-    color: "#d09bff";
-    margin-left: 10px;
+    color: #d09bff;
+    font-family: 'Lato', sans-serif;
+    margin-inline: 5px;
 }
 
-.newsPublishPara{
-    font-family: 'Oswald', sans-serif;
+.newsPublish{
+    /* font-family: 'Oswald', sans-serif; */
+    color: #e88c68;
+    font-family: 'Lato', sans-serif;
+    margin-left: 5px;
+}
+
+.urltoNews{
+    transition: 0.3s;
 }
