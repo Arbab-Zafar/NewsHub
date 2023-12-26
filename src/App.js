@@ -2,7 +2,10 @@ import './App.css';
 import News from './News';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import LoadingBar from 'react-top-loading-bar'
+import LoadingBar from 'react-top-loading-bar';
+import Country from "./Country";
+import Category from "./Category";
+import Controller from './Controller';
 
 let response = {
   "status": "ok",
@@ -224,20 +227,19 @@ function App() {
   }
 
   function prevFunc() {
-    setProgress(35)
-    setPageNo(pageNo > 1 ? pageNo - 1 : pageNo)
-    setProgress(100)
+    setProgress(35);
+    setPageNo(pageNo > 1 ? pageNo - 1 : pageNo);
+    setProgress(100);
   }
   function nextFunc() {
-    setProgress(35)
-    setPageNo(pageNo < Math.ceil(data.totalResults / 15) ? pageNo + 1 : pageNo)
-    setProgress(100)
+    setProgress(35);
+    setPageNo(pageNo < Math.ceil(data.totalResults / 15) ? pageNo + 1 : pageNo);
+    setProgress(100);
   }
 
   function searchNews(e) {
     setSearch(e.target.value);
     let newsTitle = document.querySelectorAll('.newsTitle');
-    // let newsDesc = document.querySelectorAll('.newsDesc');
     if (search !== "") {
       newsTitle.forEach((element, index) => {
         if (element.innerHTML.toLowerCase().includes(search.toLowerCase()) || element.nextSibling.innerHTML.toLowerCase().includes(search.toLowerCase())) {
@@ -245,18 +247,9 @@ function App() {
         }
         else {
           document.querySelectorAll('.news')[index].style.display = "none";
-          // document.querySelector('.allNews').innerText = "No news found!"
           document.querySelector(".nonewsfound").style.display = "flex";
         }
       })
-      // newsDesc.forEach((element, index) => {
-      //   if (element.innerHTML.toLowerCase().includes(search.toLowerCase())) {
-      //     document.querySelectorAll('.news')[index].style.display = "flex";
-      //   }
-      //   else {
-      //     document.querySelectorAll('.news')[index].style.display = "none";
-      //   }
-      // })
     }
     else {
       document.querySelectorAll('.news').forEach(e => {
@@ -267,6 +260,27 @@ function App() {
       document.querySelectorAll('.news').forEach(e => {
         e.style.display = "flex";
       })
+    }
+  }
+  const getData = (data) => { setCountry(data) }
+  const getData2 = (data) => { setCategory(data) }
+  const getData3 = (data) => { setCountry(data) }
+  const getData4 = (data) => { setCategory(data) }
+  const getData5 = (data) => { handleOk() }
+
+  function barClick() {
+    let controller1 = document.querySelector('.controller1');
+    if (controller1.style.display === 'none') {
+      controller1.style.display = 'flex';
+      setTimeout(() => {
+        controller1.style.opacity = 1;
+      }, 300);
+    }
+    else {
+      controller1.style.opacity = 0;
+      setTimeout(() => {
+        controller1.style.display = 'none';
+      }, 300);
     }
   }
 
@@ -286,97 +300,16 @@ function App() {
           <i className="fa-solid fa-newspaper fa-xl" style={{ color: "#daa520" }}></i>
           <h1>News Hub</h1>
         </div>
-        <div className="controller">
-          <select name="country" id="country" onChange={(e) => setCountry(e.target.value)}>
-            {/* <option value="select">Country</option> */}
-            <option value="in">India</option>
-            <option value="ae">United Arab Emirates</option>
-            <option value="ar">Argentina</option>
-            <option value="at">Austria</option>
-            <option value="au">Australia</option>
-            <option value="be">Belgium</option>
-            <option value="bg">Bulgaria</option>
-            <option value="br">Brazil</option>
-            <option value="ca">Canada</option>
-            <option value="ch">Switzerland</option>
-            <option value="cn">China</option>
-            <option value="co">Colombia</option>
-            <option value="cu">Cuba</option>
-            <option value="cz">Czechia</option>
-            <option value="de">Germany</option>
-            <option value="eg">Egypt</option>
-            <option value="fr">France</option>
-            <option value="gb">United Kingdom</option>
-            <option value="gr">Greece</option>
-            <option value="hk">Hong Kong</option>
-            <option value="hu">Hungary</option>
-            <option value="id">Indonesia</option>
-            <option value="ie">Ireland</option>
-            <option value="il">Israel</option>
-            <option value="it">Italy</option>
-            <option value="jp">Japan</option>
-            <option value="lt">Lithuania</option>
-            <option value="lv">Latvia</option>
-            <option value="ma">Morocco</option>
-            <option value="mx">Mexico</option>
-            <option value="my">Malaysia</option>
-            <option value="ng">Nigeria</option>
-            <option value="nl">Netherlands</option>
-            <option value="no">Norway</option>
-            <option value="nz">New Zealand</option>
-            <option value="ph">Phillipines</option>
-            <option value="pl">Poland</option>
-            <option value="pt">Portugal</option>
-            <option value="ro">Romania</option>
-            <option value="rs">Serbia</option>
-            <option value="ru">Russia</option>
-            <option value="sa">Saudi Arabia</option>
-            <option value="se">Sweden</option>
-            <option value="sg">Singapore</option>
-            <option value="si">Slovenia</option>
-            <option value="sk">Slovakia</option>
-            <option value="th">Thailand</option>
-            <option value="tr">Turkey</option>
-            <option value="tw">Taiwan</option>
-            <option value="ua">Ukraine</option>
-            <option value="us">Unnited States of America</option>
-            <option value="ve">Venezuela</option>
-            <option value="za">South Africa</option>
-          </select>
-          <select name="category" id="category" onChange={(e) => setCategory(e.target.value)}>
-            {/* <option value="select">Category</option> */}
-            <option value="general">General</option>
-            <option value="business">Business</option>
-            <option value="entertainment">Entertainment</option>
-            <option value="health">Health</option>
-            <option value="science">Science</option>
-            <option value="sports">Sports</option>
-            <option value="technology">Technology</option>
-          </select>
-          {/* <select name="language" id="language" onChange={(e) => setLanguage(e.target.value)}>
-            <option value="en">English</option>
-            <option value="ar">Arabic</option>
-            <option value="de">German</option>
-            <option value="es">Spanish</option>
-            <option value="fr">French</option>
-            <option value="he">Hebrew</option>
-            <option value="it">Italian</option>
-            <option value="nl">Dutch</option>
-            <option value="no">Norwegian</option>
-            <option value="pt">Portuguese</option>
-            <option value="ru">Russian</option>
-            <option value="sv">Swedish</option>
-            <option value="zh">Chinese</option>
-          </select> */}
-          {/* <select name="sort" id="sort" onChange={(e) => setSort(e.target.value)}>
-            <option value="publishedAt">Published At</option>
-            <option value="relevancy">Relevancy</option>
-            <option value="popularity">Popularity</option>
-          </select> */}
-          <input type="text" name="search" id="search" placeholder='Write the topic...' value={query} onChange={(e) => setQuery(e.target.value)} />
-          <button id="ok" onClick={() => handleOk()}>OK</button>
+        <i className="fa-solid fa-bars fa-xl" style={{ color: "#816f44", display: screenWidth > 850 ? "none" : "initial" }} onClick={() => barClick()}></i>
+
+        <div className="controller" style={{ display: screenWidth < 850 ? "none" : "initial" }}>
+          <Country onChange={getData} />
+          <Category onChange={getData2} />
+          <input type="text" name="search" id="search" placeholder='Write the topic...' value={query} onChange={(e) => setQuery(e.target.value)} style={{ width: screenWidth < 850 ? "120px" : "185px" }} />
+          <button className="ok" onClick={() => handleOk()}>OK</button>
         </div>
       </div>
+      <Controller onChange1={getData3} onChange2={getData4} onChange3={getData5} />
       <h3 id='topHeadlines'>Top Headlines</h3>
       <div style={{ position: "relative" }}>
         <input type="text" name="search2" id="search2" placeholder='Search news...' value={search} onChange={(e) => searchNews(e)} />
@@ -410,7 +343,7 @@ function App() {
             </div>)
       }
 
-      <div className="nonewsfound" style={{marginBlock: "10px", display: "none", display: "flex", justifyContent: "center", fontSize: "13px"}}>No news found!</div>
+      <div className="nonewsfound" style={{ marginBlock: "10px", display: "none", justifyContent: "center", fontSize: "13px" }}>No news found!</div>
 
       <div className="pageDiv">
         <button className="prev" onClick={() => prevFunc()}><i className="fa-solid fa-arrow-left" style={{ color: "#ffffff" }} ></i></button>

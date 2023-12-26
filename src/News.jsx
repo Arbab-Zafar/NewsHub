@@ -12,6 +12,10 @@ const News = ({ news, screenWidth, id }) => {
             newsElement.getElementsByTagName('a')[0].href = news.url;
             newsElement.getElementsByTagName('a')[0].style.display = "flex";
         }
+        else{
+            document.querySelectorAll('.news')[id].getElementsByTagName('a')[0].href = news.url;
+            document.querySelectorAll('.news')[id].getElementsByTagName('a')[0].style.display = "flex";
+        }
     }
     let date = new Date(news.publishedAt);
     date = date.toString().slice(0, -34); // "Wed Jun 29 2011 09:52:48 GMT-0700 (PDT)"
