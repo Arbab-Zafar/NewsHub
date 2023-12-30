@@ -1,11 +1,12 @@
 import './App.css';
-import News from './News';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import LoadingBar from 'react-top-loading-bar';
-import Country from "./Country";
-import Category from "./Category";
-import Controller from './Controller';
+import News from './components/News';
+import Country from "./components/Country";
+import Category from "./components/Category";
+import Controller from './components/Controller';
+import Popup from './components/Popup';
 
 let response = {
   "status": "ok",
@@ -169,59 +170,73 @@ let response = {
     }
   ]
 }
-
+// Sample data 
 let demoData = response;
 
+// Getting screenwidth so that it can adapt 
 let screenWidth = window.innerWidth;
+
+// Index of the news component
 let keyIndex = 0;
 
 function App() {
+  // Variables 
   const apikey = process.env.REACT_APP_ONLY_API_KEY;
-  // ALL USE STATE 
+
+  // States
   const [country, setCountry] = useState("in");
   const [category, setCategory] = useState("general");
-  // const [sort, setSort] = useState("publishedAt");
-  // const [language, setLanguage] = useState("en");
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
   const [pageNo, setPageNo] = useState(1);
   const [data, setData] = useState(demoData);
-  const [progress, setProgress] = useState(0)
+  const [progress, setProgress] = useState(0);
+  const [show, setShow] = useState(false);
 
-  // async function fetchNews(country, category, searchQuery) {
-  //   console.log("query= ", searchQuery);
-  //   let API_KEY = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&q=${searchQuery}&pageSize=100&page=${pageNo}&apiKey=34799383882949a7bfa3e5263b55f27a`;
-  //   let response = await fetch(API_KEY);
-  //   let data = await response.json();
-  //   setData(data);
-  //   console.log("DATA", data);
-  //   keyIndex = 0;
-  // }
+  // Main Engine (Function to fetch news)
   async function fetchNews(country, category, searchQuery) {
-    setProgress(10);
-    let API_KEY = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&q=${searchQuery}&pageSize=100&page=${pageNo}&apiKey=${apikey}`;
-    // let response = await fetch(API_KEY);
+    setPageNo(1);
+    setProgress(10); //set top loader progress to 10 
+    let API_KEY = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&q=${searchQuery}&pageSize=100&page=1&apiKey=${apikey}`; //framing API key
+
     try {
-      const response = await axios.get(API_KEY);
+      const response = await axios.get(API_KEY);//function to fetch api using axios
       setProgress(50);
-      setData(response.data)
+      setData(response.data) // set data to data state 
       setProgress(100);
     } catch (error) {
-      console.error(error);
+      setProgress(100);
+      setShow(true) // to show the error output
     }
-    // console.log("DATA", data);
+    // Set the index of news component to 0 beacuse the data is news and it will re-render the news component
     keyIndex = 0;
   }
 
-  useEffect(() => { 
-    fetchNews(country, category, query) 
-     // eslint-disable-next-line
+  // Use effects 
+  useEffect(() => { // Fetch news for one time when the page is loaded.
+    fetchNews(country, category, query)
+    // eslint-disable-next-line
   }, [])
 
+
+  useEffect(() => { // this will run whenever the show state is changed.
+    if (show) {
+      document.body.style.overflowY = "hidden"; // when we have to show popup then don't allow scroll
+    }
+    else {
+      document.body.style.overflowY = "scroll";
+    }
+  }, [show])
+
+  // Functions 
+  function setShowFalse() {
+    setShow(false);
+  }
+
   function handleOk() {
-    if (country !== "" && category !== "") {
-      if (country !== "select" && category !== "select") {
-        fetchNews(country, category, query);
+    if (country !== "" && category !== "") { // if value of category and country select is not blank
+      if (country !== "select" && category !== "select") { // if value of category and country select is not select
+        fetchNews(country, category, query); // call the main fetch news function
       }
     }
   }
@@ -262,13 +277,16 @@ function App() {
       })
     }
   }
+
+  // These are the functions that get get data from the components and set the state 
+  // In components, in select tag, on click, it will add the data (e.target.value) to onChange (props.onChange(e.target.value)) and onChange (<Country onChange={getData} />) will pass to getData and getData will set the data (const getData = (data) => { setCountry(data) })
   const getData = (data) => { setCountry(data) }
   const getData2 = (data) => { setCategory(data) }
   const getData3 = (data) => { setCountry(data) }
   const getData4 = (data) => { setCategory(data) }
   const getData5 = (data) => { handleOk() }
 
-  function barClick() {
+  function barClick() { // on phone when someone clicks on hamburger
     let controller1 = document.querySelector('.controller1');
     if (controller1.style.display === 'none') {
       controller1.style.display = 'flex';
@@ -295,11 +313,13 @@ function App() {
         progress={progress}
         onLoaderFinished={() => setProgress(0)}
       />
+
       <div className='navbar'>
         <div className='name'>
           <i className="fa-solid fa-newspaper fa-xl" style={{ color: "#daa520" }}></i>
           <h1>News Hub</h1>
         </div>
+
         <i className="fa-solid fa-bars fa-xl" style={{ color: "#816f44", display: screenWidth > 850 ? "none" : "initial" }} onClick={() => barClick()}></i>
 
         <div className="controller" style={{ display: screenWidth < 850 ? "none" : "initial" }}>
@@ -308,19 +328,23 @@ function App() {
           <input type="text" name="search" id="search" placeholder='Write the topic...' value={query} onChange={(e) => setQuery(e.target.value)} style={{ width: screenWidth < 850 ? "120px" : "185px" }} />
           <button className="ok" onClick={() => handleOk()}>OK</button>
         </div>
+
       </div>
+
       <Controller onChange1={getData3} onChange2={getData4} onChange3={getData5} />
       <h3 id='topHeadlines'>Top Headlines</h3>
+
       <div style={{ position: "relative" }}>
         <input type="text" name="search2" id="search2" placeholder='Search news...' value={search} onChange={(e) => searchNews(e)} />
         <i className="fa-solid fa-magnifying-glass" style={{ color: "#8AAAE5" }} id='searchIcon'></i>
       </div>
+
       {
         data.articles.forEach(e => {
           //idk but it was running 2 times that's why
           if (e.index === undefined) {
             if (keyIndex >= 15) {
-              e.index = keyIndex - (15 * pageNo);
+              e.index = keyIndex - (15 * pageNo); // give index to all news div acc. to page
             }
             else {
               e.index = keyIndex;
@@ -329,11 +353,8 @@ function App() {
           }
         })
       }
-      {/* {
-        console.log("Sliced data", data.articles.slice(15 * pageNo - 15, 15 * pageNo))
-      } */}
       {
-        data.articles.length !== 0 ? (
+        data.articles.length !== 0 ? ( // Adding data to News component and adding it to html
           <div className="allNews">
             {data.articles.slice(15 * pageNo - 15, 15 * pageNo).map((e) => { return <News news={e} screenWidth={screenWidth} key={e.title} id={e.index} /> })}
           </div>)
@@ -351,6 +372,7 @@ function App() {
         <button className="next" onClick={() => nextFunc()}><i className="fa-solid fa-arrow-right" style={{ color: "#ffffff" }}></i></button>
       </div>
 
+      {show && <Popup show={setShowFalse} />}
     </div>
   );
 }
